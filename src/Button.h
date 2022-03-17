@@ -16,7 +16,7 @@ namespace Zalari
         uint8_t lastState;
 
     public:
-        Button(uint8_t pin) : p(pin), limbo(0), state(1), lastState(0)
+        explicit Button(uint8_t pin) : p(pin), limbo(0), state(1), lastState(0)
         {
             /**
              * If pin is configured with INPUT_PULLUP

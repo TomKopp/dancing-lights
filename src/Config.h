@@ -1,5 +1,9 @@
 #pragma once
 
+#ifndef LED_BUILTIN
+#define LED_BUILTIN 2
+#endif
+
 namespace Zalari
 {
     static const uint16_t TICKS_PER_SECOND = 100; // in Hertz

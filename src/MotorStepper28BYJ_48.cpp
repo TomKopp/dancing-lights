@@ -6,7 +6,7 @@
 namespace Zalari
 {
     MotorStepper28BYJ_48::MotorStepper28BYJ_48(uint8_t pinCoilA1, uint8_t pinCoilA2, uint8_t pinCoilB1, uint8_t pinCoilB2)
-        : pA1(pinCoilA1), pA2(pinCoilA2), pB1(pinCoilB1), pB2(pinCoilB2), seqPhase(0), steps(0), disabled(true)
+        : pA1(pinCoilA1), pA2(pinCoilA2), pB1(pinCoilB1), pB2(pinCoilB2), seqPhase(0), steps(0), disabled(true), dirty(false)
     {
         pinMode(pA1, OUTPUT);
         pinMode(pA2, OUTPUT);

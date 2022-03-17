@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stdafx.h"
+#include <Arduino.h>
 
 namespace Zalari
 {
@@ -69,7 +69,7 @@ namespace Zalari
                     {
                         Serial.read();
                     }
-                    // expicit fall through
+                    // explicit fall through
                 case ',':
                 case '&':
                     // buffer has next force as string

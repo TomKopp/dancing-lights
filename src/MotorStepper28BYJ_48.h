@@ -58,11 +58,11 @@ namespace Zalari
         MotorStepper28BYJ_48(uint8_t, uint8_t, uint8_t, uint8_t);
         ~MotorStepper28BYJ_48();
 
-        void setPosition(double);
+        void setPosition(double) override;
         void setPosition(int32_t);
-        void disable();
-        void enable();
-        void update();
-        void render();
+        void disable() override;
+        void enable() override;
+        void update() override;
+        void render() override;
     };
 }
