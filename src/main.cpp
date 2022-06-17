@@ -32,10 +32,10 @@ void loop()
     while (millis() > nextTick && skippedFrames < MAX_SKIPPEDFRAMES)
     {
         //* Update
-        btn1.sample();
-        btn2.sample();
-        btn3.sample();
-        btn4.sample();
+        btn1.update();
+        btn2.update();
+        btn3.update();
+        btn4.update();
         m1.update();
         m2.update();
 

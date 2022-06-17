@@ -26,7 +26,7 @@ namespace Zalari
             pinMode(p, INPUT_PULLUP);
         }
 
-        void sample()
+        void update()
         {
             // digitalRead returns LOW (0x0) if active or HIGH (0x1) if inactive
             limbo = (limbo << 1) | digitalRead(p);
