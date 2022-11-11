@@ -6,7 +6,7 @@
 namespace Zalari
 {
     MotorSynchron::MotorSynchron(uint8_t pin1, uint8_t pin2)
-        : p1(pin1), p2(pin2), direction(0.0), state(MotorSynchron::State::STOP), disabled(true), isWaiting(false)
+        : p1(pin1), p2(pin2), direction(0.0), state(MotorSynchron::State::STOP), disabled(true), dirty(false)
     {
         pinMode(p1, OUTPUT);
         pinMode(p2, OUTPUT);
@@ -25,27 +25,46 @@ namespace Zalari
     {
         // calc time to turn from angle
         direction = angleRad;
-    };
+    }
 
     void MotorSynchron::disable()
     {
         disabled = true;
-    };
+    }
 
     void MotorSynchron::enable()
     {
         disabled = false;
-    };
+    }
+
+    void MotorSynchron::setState()
+    {
+        if (stateOld == MotorSynchron::State::NEG && state == MotorSynchron::State::POS ||
+            stateOld == MotorSynchron::State::POS && state == MotorSynchron::State::NEG)
+            state = MotorSynchron::State::STOP;
+
+        return;
+    }
 
     void MotorSynchron::update()
     {
-        stateOld = state;
-
-        if (direction > 0)
+        switch ((direction > 0) - (direction < 0))
+        {
+        case 1:
             state = MotorSynchron::State::POS;
-        else
+            // allowed() ? set state : set to stop
+            setState();
+            break;
+        case -1:
             state = MotorSynchron::State::NEG;
-    };
+            // allowed() ? set state : set to stop
+            setState();
+            break;
+        default:
+            state = MotorSynchron::State::STOP;
+            break;
+        }
+    }
 
     void MotorSynchron::render()
     {
@@ -54,25 +73,19 @@ namespace Zalari
         {
             digitalWrite(p1, LOW);
             digitalWrite(p2, LOW);
+            stateOld = MotorSynchron::State::STOP;
             return;
         }
 
         // If nothing changed, do nothing
-        if (state == stateOld)
+        if (stateOld == state)
             return;
 
         // if state changed
         // STOP the motor for x millis
-        if (!isWaiting)
-        {
-            digitalWrite(p1, LOW);
-            digitalWrite(p2, LOW);
-            isWaiting = true;
-            nextTick = millis() + DEBOUNCEDELAY;
-        }
 
         // if motor stopped for x millis, set new state
-        if (isWaiting && millis() > nextTick)
+        if (millis() > nextTick)
         {
             // Change the state
             switch (state)
@@ -88,10 +101,10 @@ namespace Zalari
             default: // State::Stopped:
                 digitalWrite(p1, LOW);
                 digitalWrite(p2, LOW);
+                nextTick = millis() + 200;
                 break;
             }
-
-            isWaiting = false;
+            stateOld = state;
         }
     }
 };

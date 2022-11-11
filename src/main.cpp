@@ -31,14 +31,6 @@ void loop()
     skippedFrames = 0;
     while (millis() > nextTick && skippedFrames < MAX_SKIPPEDFRAMES)
     {
-        //* Update
-        btn1.update();
-        btn2.update();
-        // btn3.update();
-        // btn4.update();
-        m1.update();
-        // m2.update();
-
         ledState = LOW;
 
         //* Actions
@@ -85,6 +77,14 @@ void loop()
         // }
         // if (btn3.isOpen() && btn4.isOpen())
         //     m2.disable();
+
+        //* Update
+        btn1.update();
+        btn2.update();
+        // btn3.update();
+        // btn4.update();
+        m1.update();
+        // m2.update();
 
         nextTick += DEBOUNCEDELAY;
         skippedFrames++;

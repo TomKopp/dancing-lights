@@ -11,7 +11,7 @@ namespace Zalari
         const uint8_t p2;
         double direction;
         bool disabled;
-        bool isWaiting;
+        bool dirty;
         uint64_t nextTick;
 
         enum class State : char
@@ -35,8 +35,7 @@ namespace Zalari
         void render() override;
 
     private:
-        void turnNeg();
-        void turnPos();
+        void setState();
     };
 
 } // namespace Zalari
