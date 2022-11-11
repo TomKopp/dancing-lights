@@ -5,16 +5,14 @@
 
 namespace Zalari
 {
-    MotorSynchron::MotorSynchron(uint8_t pin1, uint8_t pin2) : p1(pin1), p2(pin2)
+    MotorSynchron::MotorSynchron(uint8_t pin1, uint8_t pin2)
+        : p1(pin1), p2(pin2), direction(0.0), state(MotorSynchron::State::STOP), disabled(true), isWaiting(false)
     {
         pinMode(p1, OUTPUT);
         pinMode(p2, OUTPUT);
         digitalWrite(p1, LOW);
         digitalWrite(p2, LOW);
         nextTick = millis();
-        disabled = true;
-        direction = 0.0;
-        state = MotorSynchron::State::STOP;
     }
 
     MotorSynchron::~MotorSynchron()
@@ -65,16 +63,16 @@ namespace Zalari
 
         // if state changed
         // STOP the motor for x millis
-        if (!dirty)
+        if (!isWaiting)
         {
             digitalWrite(p1, LOW);
             digitalWrite(p2, LOW);
-            dirty = true;
+            isWaiting = true;
             nextTick = millis() + DEBOUNCEDELAY;
         }
 
         // if motor stopped for x millis, set new state
-        if (dirty && millis() > nextTick)
+        if (isWaiting && millis() > nextTick)
         {
             // Change the state
             switch (state)
@@ -93,7 +91,7 @@ namespace Zalari
                 break;
             }
 
-            dirty = false;
+            isWaiting = false;
         }
     }
 };

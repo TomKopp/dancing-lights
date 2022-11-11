@@ -11,7 +11,7 @@ namespace Zalari
         const uint8_t p2;
         double direction;
         bool disabled;
-        bool dirty;
+        bool isWaiting;
         uint64_t nextTick;
 
         enum class State : char
