@@ -9,10 +9,12 @@ namespace Zalari
     {
         pinMode(p1, OUTPUT);
         pinMode(p2, OUTPUT);
-        ;
         digitalWrite(p1, LOW);
         digitalWrite(p2, LOW);
         nextTick = millis();
+        disabled = true;
+        direction = 0.0;
+        state = MotorSynchron::State::STOP;
     }
 
     MotorSynchron::~MotorSynchron()
@@ -30,7 +32,6 @@ namespace Zalari
     void MotorSynchron::disable()
     {
         disabled = true;
-        dirty = true;
     };
 
     void MotorSynchron::enable()
@@ -40,21 +41,17 @@ namespace Zalari
 
     void MotorSynchron::update()
     {
-        if (millis() > nextTick)
-        {
-            dirty = true;
-            nextTick += DEBOUNCEDELAY;
-        }
+        stateOld = state;
+
+        if (direction > 0)
+            state = MotorSynchron::State::POS;
         else
-        {
-            dirty = false;
-        }
+            state = MotorSynchron::State::NEG;
     };
 
     void MotorSynchron::render()
     {
-        if (!dirty)
-            return;
+        // Emergency stop
         if (disabled)
         {
             digitalWrite(p1, LOW);
@@ -62,16 +59,41 @@ namespace Zalari
             return;
         }
 
-        if (direction > 0)
-        {
-            digitalWrite(p1, HIGH);
-            digitalWrite(p2, LOW);
-        }
-        else
+        // If nothing changed, do nothing
+        if (state == stateOld)
+            return;
+
+        // if state changed
+        // STOP the motor for x millis
+        if (!dirty)
         {
             digitalWrite(p1, LOW);
-            digitalWrite(p2, HIGH);
+            digitalWrite(p2, LOW);
+            dirty = true;
+            nextTick = millis() + DEBOUNCEDELAY;
         }
-    };
 
-}
+        // if motor stopped for x millis, set new state
+        if (dirty && millis() > nextTick)
+        {
+            // Change the state
+            switch (state)
+            {
+            case MotorSynchron::State::POS:
+                digitalWrite(p1, HIGH);
+                digitalWrite(p2, LOW);
+                break;
+            case MotorSynchron::State::NEG:
+                digitalWrite(p1, LOW);
+                digitalWrite(p2, HIGH);
+                break;
+            default: // State::Stopped:
+                digitalWrite(p1, LOW);
+                digitalWrite(p2, LOW);
+                break;
+            }
+
+            dirty = false;
+        }
+    }
+};

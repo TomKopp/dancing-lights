@@ -8,8 +8,8 @@ using namespace Zalari;
 
 Button btn1(15);
 Button btn2(4);
-Button btn3(18);
-Button btn4(19);
+// Button btn3(18);
+// Button btn4(19);
 // MotorStepper28BYJ_48 m1(12, 27, 14, 13); // pink orange yellow blue
 // MotorStepper28BYJ_48 m2(25, 32, 33, 26); // pink orange yellow blue
 uint8_t ledState = LOW;
@@ -17,7 +17,7 @@ uint8_t skippedFrames = 0;
 uint64_t nextTick;
 
 MotorSynchron m1(12, 13);
-MotorSynchron m2(25, 26);
+// MotorSynchron m2(25, 26);
 
 void setup()
 {
@@ -34,15 +34,16 @@ void loop()
         //* Update
         btn1.update();
         btn2.update();
-        btn3.update();
-        btn4.update();
+        // btn3.update();
+        // btn4.update();
         m1.update();
-        m2.update();
+        // m2.update();
 
         ledState = LOW;
 
         //* Actions
-        if (btn1.isActive() || btn2.isActive() || btn3.isActive() || btn4.isActive())
+        // if (btn1.isActive() || btn2.isActive() || btn3.isActive() || btn4.isActive())
+        if (btn1.isActive() || btn2.isActive())
             ledState = HIGH;
 
         // if (btn1.isKeyDown() && !btn2.isActive())
@@ -72,18 +73,18 @@ void loop()
         if (btn1.isOpen() && btn2.isOpen())
             m1.disable();
 
-        if (btn3.isActive())
-        {
-            m2.setPosition(1);
-            m2.enable();
-        }
-        if (btn4.isActive())
-        {
-            m2.setPosition(-1);
-            m2.enable();
-        }
-        if (btn3.isOpen() && btn4.isOpen())
-            m2.disable();
+        // if (btn3.isActive())
+        // {
+        //     m2.setPosition(1);
+        //     m2.enable();
+        // }
+        // if (btn4.isActive())
+        // {
+        //     m2.setPosition(-1);
+        //     m2.enable();
+        // }
+        // if (btn3.isOpen() && btn4.isOpen())
+        //     m2.disable();
 
         nextTick += DEBOUNCEDELAY;
         skippedFrames++;
@@ -93,5 +94,5 @@ void loop()
     digitalWrite(LED_BUILTIN, ledState);
 
     m1.render();
-    m2.render();
+    // m2.render();
 }

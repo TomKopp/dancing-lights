@@ -14,6 +14,16 @@ namespace Zalari
         bool dirty;
         uint64_t nextTick;
 
+        enum class State : char
+        {
+            STOP,
+            POS,
+            NEG
+        };
+
+        State state;
+        State stateOld;
+
     public:
         MotorSynchron(uint8_t, uint8_t);
         ~MotorSynchron();
@@ -23,6 +33,10 @@ namespace Zalari
         void enable() override;
         void update() override;
         void render() override;
+
+    private:
+        void turnNeg();
+        void turnPos();
     };
 
 } // namespace Zalari
