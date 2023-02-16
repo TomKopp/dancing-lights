@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <WiFi.h>
 #include "Config.h"
 #include "Button.h"
 #include "MotorStepper28BYJ_48.h"
@@ -22,6 +23,8 @@ MotorSynchron m1(12, 13);
 void setup()
 {
     pinMode(LED_BUILTIN, OUTPUT);
+
+    WiFi.disconnect(true);
 
     nextTick = millis();
 }
