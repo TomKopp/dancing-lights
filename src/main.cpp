@@ -3,6 +3,7 @@
 #include "Button.h"
 #include "MotorStepper28BYJ_48.h"
 #include "MotorSynchron.h"
+#include "MotorDC.h"
 
 using namespace Zalari;
 
@@ -16,8 +17,9 @@ uint8_t ledState = LOW;
 uint8_t skippedFrames = 0;
 uint64_t nextTick;
 
-MotorSynchron m1(12, 13);
+// MotorSynchron m1(12, 13);
 // MotorSynchron m2(25, 26);
+MotorDC m1(12, 13);
 
 void setup()
 {
