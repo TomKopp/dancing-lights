@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include <WiFi.h>
+
 #include "Config.h"
 #include "Button.h"
 #include "MotorStepper28BYJ_48.h"
@@ -22,7 +24,31 @@ uint64_t nextTick;
 MotorDC m1(12, 13);
 
 void setup()
-{
+{   
+    char ssid[] = "ZALARI Gast";
+    char pass[] = "galarizast2019!";
+    Serial.begin(115200);
+    while (!Serial)
+        ;
+       
+
+    while (Serial.available() <= 0)
+    {
+        // send a capital A
+        Serial.print('A');
+        delay(500);
+    }
+    Serial.println("\nYou're connected.");
+
+    WiFi.begin(ssid, pass);
+    while (WiFi.status() != WL_CONNECTED)
+    {
+        delay(1000);
+        Serial.println(WiFi.status());
+
+        Serial.println("Try to connect");
+    }
+    Serial.println("Connect to internet");
     pinMode(LED_BUILTIN, OUTPUT);
 
     nextTick = millis();
