@@ -5,14 +5,13 @@
 #include "Config.h"
 #include "Button.h"
 #include "MotorDC.h"
+#include "SerialClient.h"
 
 using namespace Zalari;
 
-const char *broker = "broker.emqx.io";
-uint16_t port = 1883;
-const char *topic = "/nodejs/dancingLights";
 WiFiClient wifiClient;
 MqttClient mqttClient(wifiClient);
+SerialClient serialClient(BAUD_RATE);
 
 Button btn1(15);
 Button btn2(4);
@@ -25,7 +24,9 @@ unsigned long nextTick;
 MotorDC m1(12, 13);
 MotorDC m2(14, 27);
 
-void onMqttMessage(int messageSize)
+// Beta style MQTT class does not implement the two param version
+// void handleMqttMessage(MqttClient *client, int messageSize)
+void handleMqttMessage(int messageSize)
 {
     // we received a message, print out the topic and contents
     Serial.print("Received a message with topic '");
@@ -46,22 +47,12 @@ void onMqttMessage(int messageSize)
         Serial.print((char)mqttClient.read());
     }
     Serial.println();
-
     Serial.println();
 }
 
 void setup()
 {
-    Serial.begin(BAUD_RATE);
-    while (!Serial)
-        ;
-
-    while (Serial.available() <= 0)
-    {
-        // send a capital A
-        Serial.print('A');
-        delay(500);
-    }
+    serialClient.establishContact();
 
     Serial.println("Try to connect WiFi");
     Serial.println(SSID);
@@ -74,18 +65,17 @@ void setup()
     }
     Serial.println("Connected to WiFi");
 
-    if (!mqttClient.connect(broker, port))
+    if (!mqttClient.connect(MQTT_HOST))
     {
         Serial.print("MQTT connection failed! Error code = ");
         Serial.println(mqttClient.connectError());
-
         while (1)
             ;
     }
     Serial.println("You're connected to the MQTT broker!");
-    mqttClient.onMessage(onMqttMessage);
-    int subscribeQos = 1;
-    mqttClient.subscribe(topic, subscribeQos);
+
+    mqttClient.onMessage(handleMqttMessage);
+    mqttClient.subscribe(MQTT_TOPIC);
 
     pinMode(LED_BUILTIN, OUTPUT);
     nextTick = millis();
@@ -93,6 +83,13 @@ void setup()
 
 void loop()
 {
+    //* Preconditions
+    // call poll() regularly to allow the library to receive MQTT messages and
+    // send MQTT keep alives which avoids being disconnected by the broker
+    mqttClient.poll();
+    serialClient.poll();
+
+    //* Time sensitive calculations
     skippedFrames = 0;
     while (millis() > nextTick && skippedFrames < MAX_SKIPPEDFRAMES)
     {
@@ -145,8 +142,4 @@ void loop()
 
     m1.render();
     m2.render();
-
-    // call poll() regularly to allow the library to receive MQTT messages and
-    // send MQTT keep alives which avoids being disconnected by the broker
-    mqttClient.poll();
 }

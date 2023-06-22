@@ -14,4 +14,8 @@ namespace Zalari
 
     static const char *SSID = "ZALARI Gast";
     static const char *PASS = "galarizast2019!";
+
+    static const char *MQTT_HOST = "broker.emqx.io";
+    // static const uint16_t MQTT_PORT = 1883; // unnecessary
+    static const char *MQTT_TOPIC = "/nodejs/dancingLights";
 }
