@@ -24,32 +24,6 @@ unsigned long nextTick;
 MotorDC m1(12, 13);
 MotorDC m2(14, 27);
 
-// Beta style MQTT class does not implement the two param version
-// void handleMqttMessage(MqttClient *client, int messageSize)
-void handleMqttMessage(int messageSize)
-{
-    // we received a message, print out the topic and contents
-    Serial.print("Received a message with topic '");
-    Serial.print(mqttClient.messageTopic());
-    Serial.print("', duplicate = ");
-    Serial.print(mqttClient.messageDup() ? "true" : "false");
-    Serial.print(", QoS = ");
-    Serial.print(mqttClient.messageQoS());
-    Serial.print(", retained = ");
-    Serial.print(mqttClient.messageRetain() ? "true" : "false");
-    Serial.print("', length ");
-    Serial.print(messageSize);
-    Serial.println(" bytes:");
-
-    // use the Stream interface to print the contents
-    while (mqttClient.available())
-    {
-        Serial.print((char)mqttClient.read());
-    }
-    Serial.println();
-    Serial.println();
-}
-
 void setup()
 {
     serialClient.establishContact();
@@ -74,7 +48,7 @@ void setup()
     }
     Serial.println("You're connected to the MQTT broker!");
 
-    mqttClient.onMessage(handleMqttMessage);
+    mqttClient.onMessage(std::bind(&SerialClient::handleMqttMessage, serialClient, std::placeholders::_1, std::placeholders::_2));
     mqttClient.subscribe(MQTT_TOPIC);
 
     pinMode(LED_BUILTIN, OUTPUT);
