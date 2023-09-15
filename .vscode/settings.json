@@ -1,0 +1,11 @@
+{
+    "cSpell.words": [
+        "DEBOUNCEDELAY",
+        "mqtt",
+        "Mqtt",
+        "MQTT",
+        "SKIPPEDFRAMES",
+        "wifi"
+    ],
+    "cmake.sourceDirectory": "/Users/tkp/Projects/Zalari/dancing-lights/dancing-lights/.pio/libdeps/ESP-32DevKitC-V4/Unity"
+}

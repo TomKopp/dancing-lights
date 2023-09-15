@@ -9,10 +9,11 @@ namespace Zalari
     private:
         const uint8_t p1;
         const uint8_t p2;
-        double direction;
+        int direction;
         bool disabled;
-        bool dirty;
         uint64_t nextTick;
+        uint64_t runtime;
+        uint64_t endTime;
 
         enum class State : char
         {

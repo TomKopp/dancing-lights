@@ -5,8 +5,13 @@
 
 namespace Zalari
 {
+    /*
+     ~17000rpm @ 1:48 ratio => 354rpm axle ~ 5.8rps
+        => ~2000˚/s => ~35rad/s
+        => ~0.35rad/tick == 0.35rad/10ms
+    */
     MotorDC::MotorDC(uint8_t pin1, uint8_t pin2)
-        : p1(pin1), p2(pin2), direction(0.0), state(MotorDC::State::STOP), disabled(true), dirty(false)
+        : p1(pin1), p2(pin2), direction(0), state(MotorDC::State::STOP), disabled(true)
     {
         pinMode(p1, OUTPUT);
         pinMode(p2, OUTPUT);
@@ -24,7 +29,8 @@ namespace Zalari
     void MotorDC::setPosition(double angleRad)
     {
         // calc time to turn from angle
-        direction = angleRad;
+        runtime = (angleRad / 35) * 1000;
+        direction = (angleRad > 0) - (angleRad < 0);
     }
 
     void MotorDC::disable()
@@ -35,6 +41,7 @@ namespace Zalari
     void MotorDC::enable()
     {
         disabled = false;
+        endTime = millis() + runtime;
     }
 
     void MotorDC::setState()
@@ -42,23 +49,35 @@ namespace Zalari
         if (stateOld == MotorDC::State::NEG && state == MotorDC::State::POS ||
             stateOld == MotorDC::State::POS && state == MotorDC::State::NEG)
             state = MotorDC::State::STOP;
-
-        return;
     }
 
     void MotorDC::update()
     {
-        switch ((direction > 0) - (direction < 0))
+        if (millis() > endTime)
+        {
+            state = MotorDC::State::STOP;
+            return;
+        }
+
+        switch (direction)
         {
         case 1:
-            state = MotorDC::State::POS;
+            // state = MotorDC::State::POS;
             // allowed() ? set state : set to stop
-            setState();
+            // setState();
+            if (stateOld == MotorDC::State::NEG)
+                state = MotorDC::State::STOP;
+            else
+                state = MotorDC::State::POS;
             break;
         case -1:
-            state = MotorDC::State::NEG;
+            // state = MotorDC::State::NEG;
             // allowed() ? set state : set to stop
-            setState();
+            // setState();
+            if (stateOld == MotorDC::State::POS)
+                state = MotorDC::State::STOP;
+            else
+                state = MotorDC::State::NEG;
             break;
         default:
             state = MotorDC::State::STOP;
@@ -101,7 +120,7 @@ namespace Zalari
             default: // State::Stopped:
                 analogWrite(p1, 0);
                 analogWrite(p2, 0);
-                nextTick = millis() + 20;
+                nextTick = millis() + 10;
                 break;
             }
             stateOld = state;

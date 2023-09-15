@@ -1,8 +1,8 @@
 #pragma once
 
-#ifndef LED_BUILTIN
-#define LED_BUILTIN 2
-#endif
+// #ifndef LED_BUILTIN
+// #define LED_BUILTIN 2
+// #endif
 
 namespace Zalari
 {
@@ -15,7 +15,7 @@ namespace Zalari
     static const char *SSID = "ZALARI Gast";
     static const char *PASS = "galarizast2019!";
 
-    static const char *MQTT_HOST = "broker.emqx.io";
+    static const char *MQTT_HOST = "broker.hivemq.com";
     // static const uint16_t MQTT_PORT = 1883; // unnecessary
     static const char *MQTT_TOPIC = "/nodejs/dancingLights";
 }
