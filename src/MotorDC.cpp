@@ -29,7 +29,7 @@ namespace Zalari
     void MotorDC::setPosition(double angleRad)
     {
         // calc time to turn from angle
-        runtime = (angleRad / 35) * 1000;
+        runtime = (std::abs(angleRad) / 35) * 1000;
         direction = (angleRad > 0) - (angleRad < 0);
     }
 
@@ -44,36 +44,23 @@ namespace Zalari
         endTime = millis() + runtime;
     }
 
-    void MotorDC::setState()
-    {
-        if (stateOld == MotorDC::State::NEG && state == MotorDC::State::POS ||
-            stateOld == MotorDC::State::POS && state == MotorDC::State::NEG)
-            state = MotorDC::State::STOP;
-    }
-
     void MotorDC::update()
     {
         if (millis() > endTime)
         {
-            state = MotorDC::State::STOP;
-            return;
+            // state = MotorDC::State::STOP;
+            direction = 0;
         }
 
         switch (direction)
         {
         case 1:
-            // state = MotorDC::State::POS;
-            // allowed() ? set state : set to stop
-            // setState();
             if (stateOld == MotorDC::State::NEG)
                 state = MotorDC::State::STOP;
             else
                 state = MotorDC::State::POS;
             break;
         case -1:
-            // state = MotorDC::State::NEG;
-            // allowed() ? set state : set to stop
-            // setState();
             if (stateOld == MotorDC::State::POS)
                 state = MotorDC::State::STOP;
             else

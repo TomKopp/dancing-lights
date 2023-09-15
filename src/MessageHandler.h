@@ -21,29 +21,23 @@ namespace Zalari
         void readFromBuffer(Stream *stream)
         {
             std::string buffer;
-            // buffer.reserve(3); // In bytes
             bool isReady = false;
             std::size_t motorId = 0;
 
             while (stream->available())
             {
                 char inChar = (char)stream->read();
-                //! Debug
-                // Serial.print("Stream available");
-                // Serial.println(inChar);
-
                 switch (inChar)
                 {
                 case '=':
                     // buffer has motorId -> set _motorId
                     motorId = std::stoi(buffer);
-                    Serial.println(motorId);
+                    // Serial.print("motorId ");
+                    // Serial.println(motorId);
                     buffer.clear();
                     break;
                 case '\r':
                 case '\n':
-                    Serial.print(buffer.c_str());
-                    Serial.println(" EOL");
                     // send TactileSettings
                     isReady = true;
                     // clear dangling new-line
@@ -52,26 +46,22 @@ namespace Zalari
                     // explicit fall through
                 case '&':
                     // buffer has next force as string
-                    Serial.print("Pos ");
-                    Serial.println(std::stod(buffer));
+                    // Serial.print("Pos ");
+                    // Serial.println(std::stod(buffer));
                     motors.at(motorId)->setPosition(std::stod(buffer));
                     buffer.clear();
                     break;
                 default:
                     buffer += inChar;
-                    Serial.println(buffer.c_str());
                 }
             }
 
             if (isReady)
             {
                 // Set motors into motion
-                Serial.println("Ready");
-                for (const auto &m : motors) {
-                // don't enable motors that were not send
+                // ToDo don't enable motors that were not send
+                for (const auto &m : motors)
                     m->enable();
-                    Serial.println("enable");
-                }
                 isReady = false;
             }
         }
@@ -92,19 +82,15 @@ namespace Zalari
             // Serial.print(client->messageQoS());
             // Serial.print(", retained = ");
             // Serial.print(client->messageRetain() ? "true" : "false");
-            Serial.print("', length ");
-            Serial.print(messageSize);
-            Serial.println(" bytes:");
+            // Serial.print("', length ");
+            // Serial.print(messageSize);
+            // Serial.println(" bytes:");
 
             readFromBuffer(client);
         }
 
         void handleSerialMessage(HardwareSerial *serial)
         {
-            // if (settings == nullptr)
-            // {
-            //     settings = new TactileSettings();
-            // }
             readFromBuffer(serial);
         }
     };

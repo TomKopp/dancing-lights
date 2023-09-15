@@ -15,12 +15,12 @@ Button btn2(4);
 Button btn3(18);
 Button btn4(19);
 
-MotorDC m1(12, 13);
-MotorDC m2(14, 27);
+MotorDC m1(12, 14);
+MotorDC m2(26, 27);
 
 WiFiClient wifiClient;
 MqttClient mqttClient(wifiClient);
-MessageHandler msgHandler(std::array<Motor *, 2>{{&m1, &m2}});
+MessageHandler msgHandler(std::array<Motor *, 2>{&m1, &m2});
 
 uint8_t ledState = LOW;
 uint8_t skippedFrames = 0;
@@ -30,16 +30,16 @@ void setup()
 {
     // Connect Serial
     Serial.begin(BAUD_RATE);
-    while (!Serial)
-        ;
+    // while (!Serial)
+    //     ;
 
-    while (Serial.available() <= 0)
-    {
-        // send a capital A
-        Serial.print('A');
-        delay(500);
-    }
-    Serial.println("\nYou're connected.");
+    // while (Serial.available() <= 0)
+    // {
+    //     // send a capital A
+    //     Serial.print('A');
+    //     delay(500);
+    // }
+    // Serial.println("\nYou're connected.");
 
     // Connect WiFi
     Serial.println("Try to connect WiFi");

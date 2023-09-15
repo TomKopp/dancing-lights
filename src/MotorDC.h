@@ -9,7 +9,7 @@ namespace Zalari
     private:
         const uint8_t p1;
         const uint8_t p2;
-        int direction;
+        signed char direction;
         bool disabled;
         uint64_t nextTick;
         uint64_t runtime;
@@ -34,9 +34,6 @@ namespace Zalari
         void enable() override;
         void update() override;
         void render() override;
-
-    private:
-        void setState();
     };
 
 } // namespace Zalari
