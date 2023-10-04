@@ -10,11 +10,6 @@
 
 using namespace Zalari;
 
-Button btn1(15);
-Button btn2(4);
-Button btn3(18);
-Button btn4(19);
-
 MotorDC m1(12, 14);
 MotorDC m2(26, 27);
 
@@ -28,6 +23,10 @@ unsigned long nextTick;
 
 void setup()
 {
+#ifdef LED_BUILTIN
+    pinMode(LED_BUILTIN, OUTPUT);
+#endif
+
     // Connect Serial
     Serial.begin(BAUD_RATE);
     // while (!Serial)
@@ -42,13 +41,15 @@ void setup()
     // Serial.println("\nYou're connected.");
 
     // Connect WiFi
-    Serial.println("Try to connect WiFi");
+    Serial.print("Try to connect WiFi: ");
     Serial.println(SSID);
-    Serial.println(PASS);
     WiFi.begin(SSID, PASS);
     while (WiFi.status() != WL_CONNECTED)
     {
-        Serial.print(".");
+#ifdef LED_BUILTIN
+        ledState = !ledState;
+        digitalWrite(LED_BUILTIN, ledState);
+#endif
         delay(1000);
     }
     Serial.println("Connected to WiFi");
@@ -58,6 +59,9 @@ void setup()
     {
         Serial.print("MQTT connection failed! Error code = ");
         Serial.println(mqttClient.connectError());
+#ifdef LED_BUILTIN
+        digitalWrite(LED_BUILTIN, HIGH);
+#endif
         while (1)
             ;
     }
@@ -71,7 +75,9 @@ void setup()
     mqttClient.subscribe(MQTT_TOPIC);
 
     // Generic setup
-    // pinMode(LED_BUILTIN, OUTPUT);
+#ifdef LED_BUILTIN
+    digitalWrite(LED_BUILTIN, LOW);
+#endif
     nextTick = millis();
 }
 
@@ -81,9 +87,6 @@ void loop()
     // call poll() regularly to allow the library to receive MQTT messages and
     // send MQTT keep alive which avoids being disconnected by the broker
     mqttClient.poll();
-    // if (Serial.available()) {
-    //     msgHandler.handleSerialMessage(&Serial);
-    // }
 
     //* Time sensitive calculations
     skippedFrames = 0;
@@ -91,40 +94,9 @@ void loop()
     {
         //* PreAction
         ledState = LOW;
-        btn1.update();
-        btn2.update();
-        btn3.update();
-        btn4.update();
 
         //* Actions
-        // if (btn1.isActive() || btn2.isActive() || btn3.isActive() || btn4.isActive())
-        //     ledState = HIGH;
 
-        // if (btn1.isActive())
-        // {
-        //     m1.setPosition(1);
-        //     m1.enable();
-        // }
-        // if (btn2.isActive())
-        // {
-        //     m1.setPosition(-1);
-        //     m1.enable();
-        // }
-        // if (btn1.isOpen() && btn2.isOpen())
-        //     m1.disable();
-
-        // if (btn3.isActive())
-        // {
-        //     m2.setPosition(1);
-        //     m2.enable();
-        // }
-        // if (btn4.isActive())
-        // {
-        //     m2.setPosition(-1);
-        //     m2.enable();
-        // }
-        // if (btn3.isOpen() && btn4.isOpen())
-        //     m2.disable();
 
         //* PostAction
         m1.update();
@@ -135,8 +107,6 @@ void loop()
     }
 
     //* Render
-    // digitalWrite(LED_BUILTIN, ledState);
-
     m1.render();
     m2.render();
 }

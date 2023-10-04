@@ -31,24 +31,38 @@ namespace Zalari
                 {
                 case '=':
                     // buffer has motorId -> set _motorId
-                    motorId = std::stoi(buffer);
-                    // Serial.print("motorId ");
-                    // Serial.println(motorId);
+                    try
+                    {
+                        motorId = std::stoi(buffer);
+                        Serial.print("mId ");
+                        Serial.println(motorId);
+                    }
+                    catch(const std::exception& e)
+                    {
+                        Serial.println("ENOMID");
+                    }
                     buffer.clear();
                     break;
                 case '\r':
                 case '\n':
+                    // clear dangling new-line
+                    while (stream->peek() == '\n')
+                        stream->read();
                     // send TactileSettings
                     isReady = true;
-                    // clear dangling new-line
-                    if (stream->peek() == '\n')
-                        stream->read();
                     // explicit fall through
                 case '&':
-                    // buffer has next force as string
-                    // Serial.print("Pos ");
-                    // Serial.println(std::stod(buffer));
-                    motors.at(motorId)->setPosition(std::stod(buffer));
+                    // buffer has next position as string
+                    try
+                    {
+                        motors.at(motorId)->setPosition(std::stod(buffer));
+                        Serial.print("Pos ");
+                        Serial.println(std::stod(buffer));
+                    }
+                    catch(const std::exception& e)
+                    {
+                        Serial.println("ENOPOS");
+                    }
                     buffer.clear();
                     break;
                 default:
@@ -62,12 +76,11 @@ namespace Zalari
                 // ToDo don't enable motors that were not send
                 for (const auto &m : motors)
                     m->enable();
-                isReady = false;
             }
         }
 
     public:
-        MessageHandler(std::array<Motor *, 2> motors) : motors(motors)
+        explicit MessageHandler(std::array<Motor *, 2> motors) : motors(motors)
         {
         }
 
@@ -84,7 +97,7 @@ namespace Zalari
             // Serial.print(client->messageRetain() ? "true" : "false");
             // Serial.print("', length ");
             // Serial.print(messageSize);
-            // Serial.println(" bytes:");
+            // Serial.println(" bytes");
 
             readFromBuffer(client);
         }

@@ -11,13 +11,13 @@ namespace Zalari
         => ~0.35rad/tick == 0.35rad/10ms
     */
     MotorDC::MotorDC(uint8_t pin1, uint8_t pin2)
-        : p1(pin1), p2(pin2), direction(0), state(MotorDC::State::STOP), disabled(true)
+        : p1(pin1), p2(pin2), direction(0), state(MotorDC::State::STOP), stateOld(MotorDC::State::STOP), runtime(0), disabled(true)
     {
         pinMode(p1, OUTPUT);
         pinMode(p2, OUTPUT);
         digitalWrite(p1, LOW);
         digitalWrite(p2, LOW);
-        nextTick = millis();
+        nextTick = endTime = millis();
     }
 
     MotorDC::~MotorDC()
@@ -42,6 +42,8 @@ namespace Zalari
     {
         disabled = false;
         endTime = millis() + runtime;
+        Serial.print("Run ");
+        Serial.println(runtime);
     }
 
     void MotorDC::update()
@@ -87,30 +89,22 @@ namespace Zalari
         if (stateOld == state)
             return;
 
-        // if state changed
-        // STOP the motor for x millis
-
-        // if motor stopped for x millis, set new state
-        if (millis() > nextTick)
+        // Change the state
+        switch (state)
         {
-            // Change the state
-            switch (state)
-            {
-            case MotorDC::State::POS:
-                analogWrite(p1, 255);
-                analogWrite(p2, 0);
-                break;
-            case MotorDC::State::NEG:
-                analogWrite(p1, 0);
-                analogWrite(p2, 255);
-                break;
-            default: // State::Stopped:
-                analogWrite(p1, 0);
-                analogWrite(p2, 0);
-                nextTick = millis() + 10;
-                break;
-            }
-            stateOld = state;
+        case MotorDC::State::POS:
+            analogWrite(p1, 255);
+            analogWrite(p2, 0);
+            break;
+        case MotorDC::State::NEG:
+            analogWrite(p1, 0);
+            analogWrite(p2, 255);
+            break;
+        default: // State::Stopped:
+            analogWrite(p1, 0);
+            analogWrite(p2, 0);
+            break;
         }
+        stateOld = state;
     }
 };

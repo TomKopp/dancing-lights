@@ -11,9 +11,9 @@ namespace Zalari
         const uint8_t p2;
         signed char direction;
         bool disabled;
-        uint64_t nextTick;
-        uint64_t runtime;
-        uint64_t endTime;
+        unsigned long nextTick;
+        unsigned long runtime;
+        unsigned long endTime;
 
         enum class State : char
         {

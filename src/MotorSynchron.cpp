@@ -6,7 +6,7 @@
 namespace Zalari
 {
     MotorSynchron::MotorSynchron(uint8_t pin1, uint8_t pin2)
-        : p1(pin1), p2(pin2), direction(0.0), state(MotorSynchron::State::STOP), disabled(true), dirty(false)
+        : p1(pin1), p2(pin2), direction(0.0), state(MotorSynchron::State::STOP), stateOld(MotorSynchron::State::STOP), disabled(true), dirty(false)
     {
         pinMode(p1, OUTPUT);
         pinMode(p2, OUTPUT);
